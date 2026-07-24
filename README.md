@@ -1,7 +1,7 @@
 # Ultra-Low Latency 250MHz FPGA Network Parser
 
 ## Project Overview (What I Built):
-I built a hardware-accelerated, highly pipelined network packet parser targeting the Xilinx Kintex-7 FPGA architecture. Designed to sit directly in the critical path of a high-speed data network, this IP core physically processes 128-bit AXI-Stream packet data directly from an Ethernet MAC, isolates payloads, and detects sequence anomalies in real-time. 
+I built a hardware-accelerated, highly pipelined network packet parser targeting the Xilinx Kintex-7 FPGA architecture. Designed to sit directly in the critical path of a high-speed data network, this IP core physically processes 128-bit AXI-Stream packet data directly from an Ethernet MAC, isolates payloads, and detects sequence anomalies in real-time. **Crucially, this project perfectly replicates the ultra-low latency UDP packet parsing architectures used by quantitative High-Frequency Trading (HFT) firms to read data directly from stock exchanges.** 
 
 ## Features Implemented:
 - **Ultra-Low Latency:** Constant 4-clock-cycle data latency from the last beat of a network packet arriving to the clean payload being forwarded.
