@@ -31,10 +31,27 @@ xelab -debug typical tb_top -s tb_top_sim
 xsim tb_top_sim --runall
 ```
 
-### Interface & I/O Pin Mappings:
-As this project is a high-speed **IP Core**, the I/O ports do not map to physical copper pins on the FPGA package (like LEDs or buttons). Instead, the I/O interfaces map to standard internal FPGA buses:
-- `s_axis_tdata` (128-bit): Maps internally to the output of an FPGA Ethernet MAC IP.
-- `m_payload_data` (128-bit): Maps internally to the input of a PCIe DMA IP.
+### 🔌 Interface & I/O Pin Mappings
+Because this project is a high-speed **IP Core**, the I/O ports do not map to physical copper pins on the FPGA package. Instead, they map to standard internal FPGA buses:
+
+| Port Name | Direction | Width | Description / Internal Mapping |
+| :--- | :--- | :--- | :--- |
+| `clk` / `reset_n` | Input | 1-bit | Maps to the Global Clock Routing Network (BUFG). |
+| `s_axis_tdata` | Input | 128-bit | AXI-Stream Data. Maps to the output of an Ethernet MAC IP. |
+| `s_axis_tvalid` | Input | 1-bit | AXI-Stream Valid flag. |
+| `s_axis_tlast` | Input | 1-bit | AXI-Stream Last (End of Frame) flag. |
+| `m_payload_data` | Output | 128-bit | Clean payload output. Maps to a PCIe DMA IP. |
+| `m_payload_valid` | Output | 1-bit | Payload valid flag. |
+| `s_cfg_wr_en` | Input | 1-bit | Config Bus Write Enable (Maps to AXI-Lite register). |
+| `s_cfg_addr` | Input | 9-bit | Config Bus Address. |
+| `s_cfg_data` | Input | 32-bit | Config Bus Write Data. |
+| `s_cfg_rd_data` | Output | 32-bit | Config Bus Read Data. |
+| `anomaly_detected` | Output | 1-bit | Risk Layer tap: Pulses high when sequence gap is found. |
+| `anomaly_ticker` | Output | 48-bit | Risk Layer tap: Hex ID of the offending ticker. |
+| `expected_seq` | Output | 16-bit | Risk Layer tap: Expected sequence number. |
+| `received_seq` | Output | 16-bit | Risk Layer tap: Actually received sequence number. |
+| `m_timestamp` | Output | 64-bit | Observer Layer tap: Ingress cycle count timestamp. |
+| `fsm_state_dbg` | Output | 3-bit | Debug port: Current state of the parser FSM. |
 
 ## What Makes It Special (Originality & Completeness):
 While most network parsers are written in software (C++/Python) and process data in microseconds, this project operates entirely in hardware at the nanosecond level. 
