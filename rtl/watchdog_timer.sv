@@ -3,10 +3,10 @@ module watchdog_timer #(
 )(
     input  logic clk,
     input  logic reset_n,
-    input  logic fsm_active,       // HIGH when FSM != ST_IDLE
+    input  logic fsm_active,       // goes high when the FSM is busy
     output logic timeout
 );
-    // Internal 8-bit counter
+    // Counts how many cycles the FSM has been stuck without finishing a packet
     logic [7:0] timeout_cnt;
 
     always_ff @(posedge clk or negedge reset_n) begin

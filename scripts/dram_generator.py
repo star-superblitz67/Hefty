@@ -1,8 +1,8 @@
 import os
 
-# The byte-wise XOR hash function
+# Hash function — XOR all 6 bytes of the ticker name to get a table index
 def compute_hash(ticker_str):
-    # Pad to exactly 6 characters with spaces
+    # Pad short tickers (like "V") to 6 chars with spaces
     padded = ticker_str.ljust(6)[:6]
     xor_val = 0
     for c in padded:
@@ -14,10 +14,10 @@ def string_to_hex(ticker_str):
     hex_str = "".join(f"{ord(c):02X}" for c in padded)
     return hex_str
 
-# Sample ticker list
+# All 64 tickers we want the hardware to recognize
 tickers = ['AAPL', 'MSFT', 'GOOG', 'AMZN', 'NVDA', 'META', 'TSLA', 'BRK.B', 'LLY', 'V', 'UNH', 'JPM', 'XOM', 'WMT', 'JNJ', 'MA', 'PG', 'AVGO', 'HD', 'CVX', 'MRK', 'ABBV', 'COST', 'PEP', 'ADBE', 'DLQI', 'TAET', 'FEVT', 'DPMA', 'QQPT', 'TBNM', 'IEAC', 'XPOW', 'NUDV', 'SCOJ', 'CSQE', 'CUOW', 'PJOG', 'OCZH', 'FGWK', 'BJDC', 'HJUP', 'EXAP', 'CTJI', 'HGBM', 'ETJS', 'OVXX', 'YZJH', 'FQHI', 'BPAS', 'RJGZ', 'ZTBE', 'MVUV', 'ZXMP', 'CLNP', 'KWIT', 'RRGR', 'YGZJ', 'NSHB', 'GHIU', 'TLIJ', 'KYHK', 'VIFZ', 'ZMQS']
 
-# Initialize 4 banks with 64 slots each, filled with 13-digit zeros
+# Set up 4 empty banks (64 slots each) — all zeros means "no ticker here"
 banks = [["0000000000000" for _ in range(64)] for _ in range(4)]
 
 print("Generating BRAM hex files...")
@@ -25,10 +25,10 @@ for ticker in tickers:
     h_idx = compute_hash(ticker)
     hex_val = string_to_hex(ticker)
     
-    # 13-digit format: '1' + 12 hex characters
+    # The leading "1" is the valid bit — tells the hardware this slot is occupied
     valid_hex = f"1{hex_val}"
     
-    # Find the first available bank for this hash index
+    # Try to place this ticker in the first bank that has room at this hash slot
     placed = False
     for bank_idx in range(4):
         if banks[bank_idx][h_idx] == "0000000000000":

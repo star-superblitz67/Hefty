@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_top_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_top" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="4.094340 us"></ZoomEndTime>
+      <Cursor1Time time="0.550314 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="276"></NameColumnWidth>
+      <ValueColumnWidth column_width="120"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="30" />
+   <wvobject fp_name="/tb_top/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/reset_n" type="logic">
+      <obj_property name="ElementShortName">reset_n</obj_property>
+      <obj_property name="ObjectShortName">reset_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/s_axis_tdata" type="array">
+      <obj_property name="ElementShortName">s_axis_tdata[127:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_tdata[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/s_axis_tvalid" type="logic">
+      <obj_property name="ElementShortName">s_axis_tvalid</obj_property>
+      <obj_property name="ObjectShortName">s_axis_tvalid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/s_axis_tlast" type="logic">
+      <obj_property name="ElementShortName">s_axis_tlast</obj_property>
+      <obj_property name="ObjectShortName">s_axis_tlast</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/m_payload_data" type="array">
+      <obj_property name="ElementShortName">m_payload_data[127:0]</obj_property>
+      <obj_property name="ObjectShortName">m_payload_data[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/m_payload_valid" type="logic">
+      <obj_property name="ElementShortName">m_payload_valid</obj_property>
+      <obj_property name="ObjectShortName">m_payload_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/s_cfg_wr_en" type="logic">
+      <obj_property name="ElementShortName">s_cfg_wr_en</obj_property>
+      <obj_property name="ObjectShortName">s_cfg_wr_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/s_cfg_rd_en" type="logic">
+      <obj_property name="ElementShortName">s_cfg_rd_en</obj_property>
+      <obj_property name="ObjectShortName">s_cfg_rd_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/s_cfg_addr" type="array">
+      <obj_property name="ElementShortName">s_cfg_addr[8:0]</obj_property>
+      <obj_property name="ObjectShortName">s_cfg_addr[8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/s_cfg_data" type="array">
+      <obj_property name="ElementShortName">s_cfg_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_cfg_data[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/s_cfg_rd_data" type="array">
+      <obj_property name="ElementShortName">s_cfg_rd_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_cfg_rd_data[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/m_timestamp" type="array">
+      <obj_property name="ElementShortName">m_timestamp[63:0]</obj_property>
+      <obj_property name="ObjectShortName">m_timestamp[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/anomaly_ticker" type="array">
+      <obj_property name="ElementShortName">anomaly_ticker[47:0]</obj_property>
+      <obj_property name="ObjectShortName">anomaly_ticker[47:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/anomaly_detected" type="logic">
+      <obj_property name="ElementShortName">anomaly_detected</obj_property>
+      <obj_property name="ObjectShortName">anomaly_detected</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/expected_seq" type="array">
+      <obj_property name="ElementShortName">expected_seq[15:0]</obj_property>
+      <obj_property name="ObjectShortName">expected_seq[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/received_seq" type="array">
+      <obj_property name="ElementShortName">received_seq[15:0]</obj_property>
+      <obj_property name="ObjectShortName">received_seq[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/fsm_state_dbg" type="array">
+      <obj_property name="ElementShortName">fsm_state_dbg[2:0]</obj_property>
+      <obj_property name="ObjectShortName">fsm_state_dbg[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/dram_wr_en" type="logic">
+      <obj_property name="ElementShortName">dram_wr_en</obj_property>
+      <obj_property name="ObjectShortName">dram_wr_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/dram_wr_addr" type="array">
+      <obj_property name="ElementShortName">dram_wr_addr[5:0]</obj_property>
+      <obj_property name="ObjectShortName">dram_wr_addr[5:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/dram_wr_bank" type="array">
+      <obj_property name="ElementShortName">dram_wr_bank[1:0]</obj_property>
+      <obj_property name="ObjectShortName">dram_wr_bank[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/dram_wr_data" type="array">
+      <obj_property name="ElementShortName">dram_wr_data[47:0]</obj_property>
+      <obj_property name="ObjectShortName">dram_wr_data[47:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/match_found_pulse" type="logic">
+      <obj_property name="ElementShortName">match_found_pulse</obj_property>
+      <obj_property name="ObjectShortName">match_found_pulse</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/hash_idx_out" type="array">
+      <obj_property name="ElementShortName">hash_idx_out[5:0]</obj_property>
+      <obj_property name="ObjectShortName">hash_idx_out[5:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/seq_num_out" type="array">
+      <obj_property name="ElementShortName">seq_num_out[15:0]</obj_property>
+      <obj_property name="ObjectShortName">seq_num_out[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/ticker_out" type="array">
+      <obj_property name="ElementShortName">ticker_out[47:0]</obj_property>
+      <obj_property name="ObjectShortName">ticker_out[47:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/bank0_hit_out" type="logic">
+      <obj_property name="ElementShortName">bank0_hit_out</obj_property>
+      <obj_property name="ObjectShortName">bank0_hit_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/bank1_hit_out" type="logic">
+      <obj_property name="ElementShortName">bank1_hit_out</obj_property>
+      <obj_property name="ObjectShortName">bank1_hit_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/bank2_hit_out" type="logic">
+      <obj_property name="ElementShortName">bank2_hit_out</obj_property>
+      <obj_property name="ObjectShortName">bank2_hit_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top/bank3_hit_out" type="logic">
+      <obj_property name="ElementShortName">bank3_hit_out</obj_property>
+      <obj_property name="ObjectShortName">bank3_hit_out</obj_property>
+   </wvobject>
+</wave_config>

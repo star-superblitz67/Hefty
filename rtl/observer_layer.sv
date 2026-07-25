@@ -5,6 +5,7 @@ module observer_layer (
     output logic [63:0] m_timestamp
 );
 
+    // Free-running counter that snapshots the current cycle whenever a match happens
     logic [63:0] free_counter;
 
     always_ff @(posedge clk or negedge reset_n) begin

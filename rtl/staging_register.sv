@@ -10,7 +10,7 @@ module staging_register (
         if (!reset_n) begin
             staging_reg <= 48'b0;
         end
-        // asynchronous reset always in if block then Synchronous in next block
+        // Clear the register if the watchdog times out
         else if (clear) begin
             staging_reg <= 48'b0;
         end

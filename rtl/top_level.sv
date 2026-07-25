@@ -15,20 +15,20 @@ module top_level (
     input  logic [31:0]  s_cfg_data,
     output logic [31:0]  s_cfg_rd_data,
     
-    // Tap outputs exposed to top-level pins for testbench / downstream
+    // Monitoring outputs (directly visible from the testbench)
     output logic [63:0]  m_timestamp,
     output logic [47:0]  anomaly_ticker,
     output logic         anomaly_detected,
     output logic [15:0]  expected_seq,
     output logic [15:0]  received_seq,
     
-    // Debug
+    // Debug output
     output logic [2:0]   fsm_state_dbg
 );
 
-    // ---------------------------------------------------------
-    // Internal Wires (Tap signals from Core to Taps)
-    // ---------------------------------------------------------
+    
+    // Wires connecting the parser to the monitoring layers
+    
     logic         dram_wr_en;
     logic [5:0]   dram_wr_addr;
     logic [1:0]   dram_wr_bank;
@@ -43,9 +43,9 @@ module top_level (
     logic         bank2_hit_out;
     logic         bank3_hit_out;
 
-    // ---------------------------------------------------------
-    // Level 0: Parser Core
-    // ---------------------------------------------------------
+    
+    // The parser core — does all the heavy lifting (header checks, ticker lookup)
+    
     parser_core u_parser_core (
         .clk               (clk),
         .reset_n           (reset_n),
@@ -69,9 +69,9 @@ module top_level (
         .fsm_state_dbg     (fsm_state_dbg)
     );
 
-    // ---------------------------------------------------------
-    // Level 1: Risk Layer (Sequence Anomaly Tap)
-    // ---------------------------------------------------------
+    
+    // Risk layer — watches for gaps or duplicates in sequence numbers
+    
     risk_layer u_risk_layer (
         .clk               (clk),
         .reset_n           (reset_n),
@@ -89,9 +89,9 @@ module top_level (
         .bank3_hit         (bank3_hit_out)
     );
 
-    // ---------------------------------------------------------
-    // Level 1: Observer Layer (Timestamp Tap)
-    // ---------------------------------------------------------
+    
+    // Observer layer — stamps each matched packet with a nanosecond timestamp
+    
     observer_layer u_observer_layer (
         .clk         (clk),
         .reset_n     (reset_n),
@@ -99,9 +99,9 @@ module top_level (
         .m_timestamp (m_timestamp)
     );
 
-    // ---------------------------------------------------------
-    // Level 1: Config Controller (BRAM Write Tap)
-    // ---------------------------------------------------------
+    
+    // Config controller — lets software update the ticker table while the chip is running
+    
     config_controller u_config_controller (
         .clk           (clk),
         .reset_n       (reset_n),

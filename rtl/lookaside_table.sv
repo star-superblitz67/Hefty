@@ -17,29 +17,22 @@ module lookaside_table (
     output logic        bank2_hit,
     output logic        bank3_hit
 );
-    // 64-entry x 49-bit arrays, 4-way associative.
-    // Distributed LUT-RAM (RAM64X1S) is used instead of Block RAM because:
-    //   1. At 64 entries x 49 bits each bank is only 3136 bits — too small
-    //      to justify BRAM overhead.
-    //   2. BRAM has a fixed 1.8 ns CLK-to-DOADO propagation delay which
-    //      dominates the critical path at 250 MHz. Distributed RAM captures
-    //      into a standard FDRE (~0.4 ns CLK-to-Q), saving ~1.4 ns with
-    //      zero change to pipeline latency.
+
     (* ram_style = "distributed" *) logic [48:0] bank0 [0:63];
     (* ram_style = "distributed" *) logic [48:0] bank1 [0:63];
     (* ram_style = "distributed" *) logic [48:0] bank2 [0:63];
     (* ram_style = "distributed" *) logic [48:0] bank3 [0:63];
 
     initial begin
-        $readmemh("mem/bank0.hex", bank0);
-        $readmemh("mem/bank1.hex", bank1);
-        $readmemh("mem/bank2.hex", bank2);
-        $readmemh("mem/bank3.hex", bank3);
+        $readmemh("D:/fpga_parser/mem/bank0.hex", bank0);
+        $readmemh("D:/fpga_parser/mem/bank1.hex", bank1);
+        $readmemh("D:/fpga_parser/mem/bank2.hex", bank2);
+        $readmemh("D:/fpga_parser/mem/bank3.hex", bank3);
     end
 
-    // =========================================================================
-    // 1. Combinational Hash (Cycle 4)
-    // =========================================================================
+
+    // 1. Hash function — XOR all 6 bytes of the ticker down to a 6-bit table index
+    
     logic [7:0] xor_byte;
     logic [5:0] hash_idx;
 
@@ -50,9 +43,9 @@ module lookaside_table (
     assign hash_idx = xor_byte[5:0];
     assign hash_idx_out = hash_idx;
 
-    // =========================================================================
-    // 2. Synchronous BRAM Read (Cycle 4 -> Cycle 5)
-    // =========================================================================
+
+    // 2. Read all 4 banks at once (the result shows up next clock cycle)
+    
     logic [48:0] bank0_out;
     logic [48:0] bank1_out;
     logic [48:0] bank2_out;
@@ -78,9 +71,9 @@ module lookaside_table (
         end 
     end
 
-    // =========================================================================
-    // 3. Pipelined Comparison (Cycle 5)
-    // =========================================================================
+
+    // 3. Compare what we stored vs what we just looked up
+    
     logic [47:0] ticker_in_delayed;
 
     always_ff @(posedge clk or negedge reset_n) begin
@@ -91,8 +84,7 @@ module lookaside_table (
         end
     end
 
-    // 4-way OR comparison (incorporating the 49th bit as the VALID flag)
-    // TEMP: remove != 0 guard after valid-bit verified, see hole re: null-byte packets
+    // Check each bank: the top bit (bit 48) is a "valid" flag, and the lower 48 bits are the ticker
     assign bank0_hit = (bank0_out[48] & (bank0_out[47:0] == ticker_in_delayed));
     assign bank1_hit = (bank1_out[48] & (bank1_out[47:0] == ticker_in_delayed));
     assign bank2_hit = (bank2_out[48] & (bank2_out[47:0] == ticker_in_delayed));

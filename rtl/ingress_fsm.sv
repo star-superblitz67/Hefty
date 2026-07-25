@@ -7,37 +7,37 @@ module ingress_fsm (
     input  logic         s_axis_tvalid,
     input  logic         s_axis_tlast,
     
-    // From watchdog
+    //  watchdog
     input  logic         timeout,
     
-    // From lookaside table
+    //  lookaside table
     input  logic         match_found,
     
-    // To staging register
+    //  staging register
     output logic         latch_en,
     
-    // To lookaside table
+    //  lookaside table
     output logic         dram_rd_en,
     
-    // To output
+    //  output
     output logic [127:0] m_payload_data,
     output logic         m_payload_valid,
     
-    // Debug & Taps
+    // Debug, Taps
     output logic [2:0]   fsm_state_dbg,
     output logic         pipe_valid_5
 );
 
-    // V2 Architecture: 3-State FSM (Advisory / Header Tracking)
+    // Three states: idle, actively parsing a packet, or waiting to drop bad one
     localparam [2:0] ST_IDLE      = 3'b000;
     localparam [2:0] ST_ACTIVE    = 3'b001;
     localparam [2:0] ST_DROP_WAIT = 3'b010;
 
     logic [2:0] current_state, next_state;
 
-    // ------------------------------------------------------------------------
-    // 1. Decoupled Beat Counter (current_beat)
-    // ------------------------------------------------------------------------
+
+    // 1. Beat counter, tracks which 128bit chunk of the packet we are looking at
+
     logic [3:0] beat_count;
     logic       is_new_packet;
     
@@ -77,9 +77,9 @@ module ingress_fsm (
         end
     end
 
-    // ------------------------------------------------------------------------
-    // 2. The 3-State FSM (Header Validation & Drop Semantics)
-    // ------------------------------------------------------------------------
+
+    // 2. Main state machine  decides whether to keep parsing or drop the packet
+    
     always_comb begin
         next_state = current_state;
         
@@ -101,7 +101,7 @@ module ingress_fsm (
                 
                 ST_ACTIVE: begin
                     if (s_axis_tvalid && current_beat == 4'd2) begin
-                        // IP Protocol field is at bits [71:64]
+                        // Check if it is UDP (protocol 0x11). If not, drop it.
                         if (s_axis_tdata[71:64] != 8'h11) begin
                             next_state = ST_DROP_WAIT;
                         end
@@ -110,7 +110,7 @@ module ingress_fsm (
                 end
                 
                 ST_DROP_WAIT: begin
-                    // Stay here until tlast (handled globally above)
+                    // Just sit here doing nothing until the bad packet ends
                 end
                 
                 default: next_state = ST_IDLE;
@@ -126,11 +126,11 @@ module ingress_fsm (
         end
     end
 
-    // ------------------------------------------------------------------------
-    // 3. The Pipelined Datapath 
-    // ------------------------------------------------------------------------
-    // Instead of relying on FSM states, we strictly gate actions based on the
-    // valid beat counter and the header validation state.
+
+    // 3. Datapath  controls when we latch the ticker, look it up, and forward payload
+    
+    // We gate everything off the beat counter, not the FSM state.
+    // This keeps the datapath clean and predictable.
     
     assign latch_en   = (current_state == ST_ACTIVE) && s_axis_tvalid && (current_beat == 4'd3);
     assign dram_rd_en = (current_state == ST_ACTIVE) && s_axis_tvalid && (current_beat == 4'd4);
@@ -142,13 +142,13 @@ module ingress_fsm (
         end else if (timeout) begin
             pipe_valid_5 <= 1'b0;
         end else begin
-            // 1-cycle delay to align with BRAM output.
+            // One cycle delay so the lookup result is ready when we check it
             // If the packet aborted early (tlast before beat 4), dram_rd_en never fires.
             pipe_valid_5 <= dram_rd_en;
         end
     end
 
-    // Forward Stream state tracks if we should forward remaining beats of the packet
+    // match on cycle 5, keep forwarding the rest
     logic forward_stream;
     
     always_ff @(posedge clk or negedge reset_n) begin
@@ -158,7 +158,7 @@ module ingress_fsm (
             forward_stream <= 1'b0;
         end else begin
             if (pipe_valid_5 && match_found) begin
-                // If tlast is happening RIGHT NOW on cycle 5, don't enter forward_stream
+                // If the packet ends right on cycle 5, there is nothing left to forward
                 if (s_axis_tvalid && s_axis_tlast) begin
                     forward_stream <= 1'b0;
                 end else begin

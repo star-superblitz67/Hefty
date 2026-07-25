@@ -9,13 +9,13 @@ module parser_core (
     output logic [127:0] m_payload_data,
     output logic         m_payload_valid,
 
-    // BRAM write interface (from config_controller)
+    // Write port — the config controller uses this to update the ticker table
     input  logic         dram_wr_en,
     input  logic [5:0]   dram_wr_addr,
     input  logic [1:0]   dram_wr_bank,
     input  logic [47:0]  dram_wr_data,
 
-    // Tap signals out to risk_layer and observer_layer
+    // These signals go out to the risk and observer layers
     output logic         match_found_pulse,
     output logic [5:0]   hash_idx_out,
     output logic [15:0]  seq_num_out,
@@ -60,8 +60,8 @@ module parser_core (
         .staging_reg     (staging_reg)
     );
 
-    // Latch Sequence Number during Cycle 4 (when dram_rd_en is high)
-    // The sequence number is at bytes 56-57, which is tdata[63:48] in Beat 4.
+    // Grab the sequence number from the packet on beat 4
+    // It sits at bytes 56-57, which maps to tdata[63:48]
     logic [15:0] seq_num_reg;
     always_ff @(posedge clk) begin
         if (dram_rd_en) begin
@@ -78,10 +78,10 @@ module parser_core (
         .timeout         (timeout)
     );
 
-    // fsm_active monitors if a packet is currently on the wire OR in the pipeline
+    // We consider the FSM "active" if we are mid-packet or still waiting on a lookup result
     assign fsm_active  = (fsm_state_dbg != 3'b000) || pipe_valid_5;
 
-    // Pass signals out
+    // Wire internal signals to the top level
     logic [5:0]   dram_hash_idx;
     logic         bank0_hit;
     logic         bank1_hit;
@@ -105,12 +105,12 @@ module parser_core (
         .bank3_hit    (bank3_hit)
     );
 
-    // match_found stays high for the whole packet because staging_reg is constant.
-    // We must gate it to EXACTLY one cycle (Cycle 5) so the risk layer evaluates once.
+    // match_found stays on the entire time the ticker sits in the staging register,
+    // but the risk layer should only see it ONCE per packet — so we gate it to cycle 5 only
     logic risk_layer_en;
     assign risk_layer_en = match_found && pipe_valid_5;
 
-    // Pass signals out
+    // Wire internal signals to the top level
     assign hash_idx_out = dram_hash_idx;
     assign ticker_out   = staging_reg;
     assign seq_num_out  = seq_num_reg;
