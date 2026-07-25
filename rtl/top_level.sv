@@ -29,10 +29,10 @@ module top_level (
     // ---------------------------------------------------------
     // Internal Wires (Tap signals from Core to Taps)
     // ---------------------------------------------------------
-    logic         bram_wr_en;
-    logic [5:0]   bram_wr_addr;
-    logic [1:0]   bram_wr_bank;
-    logic [47:0]  bram_wr_data;
+    logic         dram_wr_en;
+    logic [5:0]   dram_wr_addr;
+    logic [1:0]   dram_wr_bank;
+    logic [47:0]  dram_wr_data;
 
     logic         match_found_pulse;
     logic [5:0]   hash_idx_out;
@@ -54,10 +54,10 @@ module top_level (
         .s_axis_tlast      (s_axis_tlast),
         .m_payload_data    (m_payload_data),
         .m_payload_valid   (m_payload_valid),
-        .bram_wr_en        (bram_wr_en),
-        .bram_wr_addr      (bram_wr_addr),
-        .bram_wr_bank      (bram_wr_bank),
-        .bram_wr_data      (bram_wr_data),
+        .dram_wr_en        (dram_wr_en),
+        .dram_wr_addr      (dram_wr_addr),
+        .dram_wr_bank      (dram_wr_bank),
+        .dram_wr_data      (dram_wr_data),
         .match_found_pulse (match_found_pulse),
         .hash_idx_out      (hash_idx_out),
         .seq_num_out       (seq_num_out),
@@ -110,10 +110,10 @@ module top_level (
         .s_cfg_addr    (s_cfg_addr),
         .s_cfg_data    (s_cfg_data),
         .s_cfg_rd_data (s_cfg_rd_data),
-        .bram_wr_en   (bram_wr_en),
-        .bram_wr_addr (bram_wr_addr),
-        .bram_wr_bank (bram_wr_bank),
-        .bram_wr_data (bram_wr_data)
+        .dram_wr_en   (dram_wr_en),
+        .dram_wr_addr (dram_wr_addr),
+        .dram_wr_bank (dram_wr_bank),
+        .dram_wr_data (dram_wr_data)
     );
 
 endmodule

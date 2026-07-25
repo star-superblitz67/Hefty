@@ -17,7 +17,7 @@ module ingress_fsm (
     output logic         latch_en,
     
     // To lookaside table
-    output logic         bram_rd_en,
+    output logic         dram_rd_en,
     
     // To output
     output logic [127:0] m_payload_data,
@@ -133,7 +133,7 @@ module ingress_fsm (
     // valid beat counter and the header validation state.
     
     assign latch_en   = (current_state == ST_ACTIVE) && s_axis_tvalid && (current_beat == 4'd3);
-    assign bram_rd_en = (current_state == ST_ACTIVE) && s_axis_tvalid && (current_beat == 4'd4);
+    assign dram_rd_en = (current_state == ST_ACTIVE) && s_axis_tvalid && (current_beat == 4'd4);
     
     // Shift register delay for BRAM latency (Cycle 4 -> Cycle 5)
     always_ff @(posedge clk or negedge reset_n) begin
@@ -143,8 +143,8 @@ module ingress_fsm (
             pipe_valid_5 <= 1'b0;
         end else begin
             // 1-cycle delay to align with BRAM output.
-            // If the packet aborted early (tlast before beat 4), bram_rd_en never fires.
-            pipe_valid_5 <= bram_rd_en;
+            // If the packet aborted early (tlast before beat 4), dram_rd_en never fires.
+            pipe_valid_5 <= dram_rd_en;
         end
     end
 

@@ -12,10 +12,10 @@ module config_controller (
     input  logic [31:0] s_cfg_data,
     output logic [31:0] s_cfg_rd_data,   
     // Outgoing Atomic 48-bit Interface
-    output logic        bram_wr_en,
-    output logic [5:0]  bram_wr_addr,
-    output logic [1:0]  bram_wr_bank,
-    output logic [47:0] bram_wr_data
+    output logic        dram_wr_en,
+    output logic [5:0]  dram_wr_addr,
+    output logic [1:0]  dram_wr_bank,
+    output logic [47:0] dram_wr_data
 );
 
     logic [31:0] lower_word_reg;
@@ -27,14 +27,14 @@ module config_controller (
             lower_word_reg      <= 32'h0;                                                           
             lower_word_addr_reg <= 8'h0;                                                            
             write_dropped_err   <= 1'b0;                                                            
-            bram_wr_en          <= 1'b0;                                                            
-            bram_wr_addr        <= 6'h0;                                                            
-            bram_wr_bank        <= 2'h0;                                                            
-            bram_wr_data        <= 48'h0;                                                           
+            dram_wr_en          <= 1'b0;                                                            
+            dram_wr_addr        <= 6'h0;                                                            
+            dram_wr_bank        <= 2'h0;                                                            
+            dram_wr_data        <= 48'h0;                                                           
             s_cfg_rd_data       <= 32'h0;
         end else begin
             // Default to 0 to ensure 1-cycle pulse
-            bram_wr_en <= 1'b0;
+            dram_wr_en <= 1'b0;
 
             // 1. Read Block (Executes first in sequential order)
             if (s_cfg_rd_en) begin
@@ -49,10 +49,10 @@ module config_controller (
                     lower_word_addr_reg <= s_cfg_addr[8:1];
                 end else begin
                     if (s_cfg_addr[8:1] == lower_word_addr_reg) begin
-                        bram_wr_data <= {s_cfg_data[15:0], lower_word_reg};                         
-                        bram_wr_addr <= s_cfg_addr[6:1];                                            
-                        bram_wr_bank <= s_cfg_addr[8:7];                                            
-                        bram_wr_en   <= 1'b1; 
+                        dram_wr_data <= {s_cfg_data[15:0], lower_word_reg};                         
+                        dram_wr_addr <= s_cfg_addr[6:1];                                            
+                        dram_wr_bank <= s_cfg_addr[8:7];                                            
+                        dram_wr_en   <= 1'b1; 
                     end else begin
                         write_dropped_err <= 1'b1;
                     end

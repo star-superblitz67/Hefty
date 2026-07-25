@@ -10,10 +10,10 @@ module parser_core (
     output logic         m_payload_valid,
 
     // BRAM write interface (from config_controller)
-    input  logic         bram_wr_en,
-    input  logic [5:0]   bram_wr_addr,
-    input  logic [1:0]   bram_wr_bank,
-    input  logic [47:0]  bram_wr_data,
+    input  logic         dram_wr_en,
+    input  logic [5:0]   dram_wr_addr,
+    input  logic [1:0]   dram_wr_bank,
+    input  logic [47:0]  dram_wr_data,
 
     // Tap signals out to risk_layer and observer_layer
     output logic         match_found_pulse,
@@ -30,7 +30,7 @@ module parser_core (
     logic         timeout;
     logic         match_found;
     logic         latch_en;
-    logic         bram_rd_en;
+    logic         dram_rd_en;
     logic [47:0]  staging_reg;
     logic         fsm_active;
     logic         pipe_valid_5;
@@ -44,7 +44,7 @@ module parser_core (
         .timeout         (timeout),
         .match_found     (match_found),
         .latch_en        (latch_en),
-        .bram_rd_en      (bram_rd_en),
+        .dram_rd_en      (dram_rd_en),
         .m_payload_data  (m_payload_data),
         .m_payload_valid (m_payload_valid),
         .fsm_state_dbg   (fsm_state_dbg),
@@ -60,11 +60,11 @@ module parser_core (
         .staging_reg     (staging_reg)
     );
 
-    // Latch Sequence Number during Cycle 4 (when bram_rd_en is high)
+    // Latch Sequence Number during Cycle 4 (when dram_rd_en is high)
     // The sequence number is at bytes 56-57, which is tdata[63:48] in Beat 4.
     logic [15:0] seq_num_reg;
     always_ff @(posedge clk) begin
-        if (bram_rd_en) begin
+        if (dram_rd_en) begin
             seq_num_reg <= s_axis_tdata[63:48];
         end
     end
@@ -82,7 +82,7 @@ module parser_core (
     assign fsm_active  = (fsm_state_dbg != 3'b000) || pipe_valid_5;
 
     // Pass signals out
-    logic [5:0]   bram_hash_idx;
+    logic [5:0]   dram_hash_idx;
     logic         bank0_hit;
     logic         bank1_hit;
     logic         bank2_hit;
@@ -91,14 +91,14 @@ module parser_core (
     lookaside_table u_lookaside_table (
         .clk          (clk),
         .reset_n      (reset_n),
-        .rd_en        (bram_rd_en),
+        .rd_en        (dram_rd_en),
         .ticker_in    (staging_reg),
         .match_found  (match_found),
-        .hash_idx_out (bram_hash_idx),
-        .cfg_wr_en    (bram_wr_en),
-        .cfg_addr     (bram_wr_addr),
-        .cfg_bank_sel (bram_wr_bank),
-        .cfg_data     (bram_wr_data),
+        .hash_idx_out (dram_hash_idx),
+        .cfg_wr_en    (dram_wr_en),
+        .cfg_addr     (dram_wr_addr),
+        .cfg_bank_sel (dram_wr_bank),
+        .cfg_data     (dram_wr_data),
         .bank0_hit    (bank0_hit),
         .bank1_hit    (bank1_hit),
         .bank2_hit    (bank2_hit),
@@ -111,7 +111,7 @@ module parser_core (
     assign risk_layer_en = match_found && pipe_valid_5;
 
     // Pass signals out
-    assign hash_idx_out = bram_hash_idx;
+    assign hash_idx_out = dram_hash_idx;
     assign ticker_out   = staging_reg;
     assign seq_num_out  = seq_num_reg;
     assign match_found_pulse = risk_layer_en;
