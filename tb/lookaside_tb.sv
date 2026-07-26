@@ -35,9 +35,9 @@ module lookaside_tb;
         
         #20 reset_n = 1;
         
-        // ----------------------------------------------------
+        
         // Trace 1 - AAPL 
-        // ----------------------------------------------------
+        
         @(posedge clk);
         ticker_in = 48'h4141_504C_2020;
         rd_en = 1;
@@ -47,9 +47,9 @@ module lookaside_tb;
         if (match_found === 1'b1) $display("Trace 1 PASS: AAPL Matched!");
         else $error("Trace 1 FAIL: AAPL Missed!");
 
-        // ----------------------------------------------------
+        
         // Trace 2 - NVDA/META collision
-        // ----------------------------------------------------
+        
         @(posedge clk);
         ticker_in = 48'h4D45_5441_2020; // Driving META
         rd_en = 1;
@@ -59,9 +59,9 @@ module lookaside_tb;
         if (match_found === 1'b1) $display("Trace 2 PASS: META Collision Matched via 4-way OR!");
         else $error("Trace 2 FAIL: META Missed!");
 
-        // ----------------------------------------------------
+        
         // Trace 3 - ZZZZZ! (Empty Bucket)
-        // ----------------------------------------------------
+        
         @(posedge clk);
         ticker_in = 48'h5A5A_5A5A_5A21;
         rd_en = 1;
@@ -71,9 +71,9 @@ module lookaside_tb;
         if (match_found === 1'b0) $display("Trace 3 PASS: ZZZZZ! Correctly Missed!");
         else $error("Trace 3 FAIL: False Positive!");
 
-        // ----------------------------------------------------
+        
         // Trace 4 - All-Zero Ticker
-        // ----------------------------------------------------
+        
         @(posedge clk);
         ticker_in = 48'h0000_0000_0000;
         rd_en = 1;
@@ -83,9 +83,9 @@ module lookaside_tb;
         if (match_found === 1'b0) $display("Trace 4 PASS: Null-byte Guard Blocked False Positive!");
         else $error("Trace 4 FAIL: Null-byte vulnerability triggered!");
 
-        // ----------------------------------------------------
+        
         // Trace 5 - EXAP (Bank 3 Deep Hit)
-        // ----------------------------------------------------
+        
         @(posedge clk);
         ticker_in = 48'h4558_4150_2020;
         rd_en = 1;
@@ -95,9 +95,9 @@ module lookaside_tb;
         if (match_found === 1'b1) $display("Trace 5 PASS: EXAP Matched via Bank 3 OR-leg!");
         else $error("Trace 5 FAIL: Bank 3 wiring broken!");
 
-        // ----------------------------------------------------
+        
         // Trace 6 - HD (Bank 2 Hit)
-        // ----------------------------------------------------
+        
         @(posedge clk);
         ticker_in = 48'h4844_2020_2020;
         rd_en = 1;

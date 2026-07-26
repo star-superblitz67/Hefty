@@ -21,9 +21,9 @@ module tb_top;
     logic [15:0]  received_seq;
     logic [2:0]   fsm_state_dbg;
 
-    // ---------------------------------------------------------
+    
     // Error tracking infrastructure
-    // ---------------------------------------------------------
+    
     int error_count    = 0; // global total across all scenarios
     int scenario_errors = 0; // per-scenario, reset before each scenario
 
@@ -63,13 +63,13 @@ module tb_top;
     // Global capture for timestamp latency (Scenario 16)
     logic [63:0] last_packet_start_time = 0;
 
-    // ---------------------------------------------------------
+    
     // fail() — the only way to record a test failure.
     // Increments both the global error_count and the current
     // scenario's scenario_errors. Print $error so xsim/Verilator
     // log it with file+line. Every "Passed" banner is gated on
     // scenario_errors == 0, so no unconditional banners exist.
-    // ---------------------------------------------------------
+    
     task automatic fail(input string msg);
         $error("%s", msg);
         error_count++;
@@ -117,9 +117,9 @@ module tb_top;
 
         #20 reset_n = 1;
 
-        // -------------------------------------------------------------
+        
         // Step 1: Configure Lookaside Table via AXI-Lite
-        // -------------------------------------------------------------
+        
         @(negedge clk);
         // Write 1: AAPL to Bank 0 (hash 28)
         s_cfg_wr_en = 1;
@@ -158,9 +158,9 @@ module tb_top;
 
         #30;
 
-        // -------------------------------------------------------------
+        
         // TODO 2: The Mismatch Attack
-        // -------------------------------------------------------------
+        
         @(negedge clk);
         s_cfg_wr_en=1;
         s_cfg_addr=9'b0_011100_0;
@@ -176,16 +176,16 @@ module tb_top;
 
         @(negedge clk);
         if(s_cfg_rd_data[0]!==1'b1) fail("2: Sticky bit not set");
-        // -------------------------------------------------------------
+        
         // TODO 3: The Read-Clear
-        // -------------------------------------------------------------
+        
         @(negedge clk);
         if(s_cfg_rd_data[0]!==1'b0) fail("3: sticky bit didnt clear");
         s_cfg_rd_en=0;
 
-        // -------------------------------------------------------------
+        
         // TODO 4: The Set-vs-Clear Race
-        // -------------------------------------------------------------
+        
         @(negedge clk);
         s_cfg_wr_en = 1;
         s_cfg_addr  = 9'b0_101000_0;
@@ -198,13 +198,13 @@ module tb_top;
         if (s_cfg_rd_data[0] !== 1'b1) fail("TODO 4 FAILED: Read-Clear swallowed the new error!");
         s_cfg_rd_en = 0;
 
-        // =============================================================
+        
         // PHASE 1: PARSER CORE (Scenarios 1-5)
-        // =============================================================
+        
 
-        // -------------------------------------------------------------
+        
         // Scenario 1: Valid Packet, In Table (AAPL)
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         @(negedge clk);
         s_axis_tvalid = 1;
@@ -239,9 +239,9 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 1 Passed: Valid Packet Processed Correctly!");
         else                      $display("Scenario 1 FAILED (%0d errors).", scenario_errors);
 
-        // -------------------------------------------------------------
+        
         // Scenario 2: Valid Packet, NOT In Table (FAKE)
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         @(negedge clk);
         s_axis_tvalid = 1;
@@ -275,9 +275,9 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 2 Passed: FAKE Ticker silently dropped!");
         else                      $display("Scenario 2 FAILED (%0d errors).", scenario_errors);
 
-        // -------------------------------------------------------------
+        
         // Scenario 3: Bad EtherType (ARP)
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         @(negedge clk);
         s_axis_tvalid = 1;
@@ -298,9 +298,9 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 3 Passed: ARP packet dropped!");
         else                      $display("Scenario 3 FAILED (%0d errors).", scenario_errors);
 
-        // -------------------------------------------------------------
+        
         // Scenario 4: Bad Protocol (TCP)
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         @(negedge clk);
         s_axis_tvalid = 1;
@@ -321,9 +321,9 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 4 Passed: TCP!");
         else                      $display("Scenario 4 FAILED (%0d errors).", scenario_errors);
 
-        // -------------------------------------------------------------
+        
         // Scenario 5: Watchdog Timeout
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         @(negedge clk);
         s_axis_tvalid = 1;
@@ -348,13 +348,13 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 5 Passed: Watchdog timeout!");
         else                      $display("Scenario 5 FAILED (%0d errors).", scenario_errors);
 
-        // =============================================================
+        
         // PHASE 2: PARSER CORE STRESS TESTS (Scenarios 6-10)
-        // =============================================================
+        
 
-        // -------------------------------------------------------------
+        
         // Scenario 6: Back-to-Back Packets
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         @(negedge clk);
         s_axis_tvalid = 1;
@@ -413,9 +413,9 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 6 Passed: Back-to-back packets!");
         else                      $display("Scenario 6 FAILED (%0d errors).", scenario_errors);
 
-        // -------------------------------------------------------------
+        
         // Scenario 7: Ticker Sequence (4 valid packets)
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         for(int i=0;i<4;i++) begin
             @(negedge clk);
@@ -450,9 +450,9 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 7 Passed: 4 Valid Packets Processed Correctly!");
         else                      $display("Scenario 7 FAILED (%0d errors).", scenario_errors);
 
-        // -------------------------------------------------------------
+        
         // Scenario 8: Mid-Packet Reset
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         @(negedge clk);
         s_axis_tvalid = 1;
@@ -515,9 +515,9 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 8 Passed: Mid-packet reset!");
         else                      $display("Scenario 8 FAILED (%0d errors).", scenario_errors);
 
-        // -------------------------------------------------------------
+        
         // Scenario 9: 100 Packets Back-to-Back
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         @(negedge clk);
         repeat (100) begin
@@ -555,9 +555,9 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 9 Passed: 100 packets!");
         else                      $display("Scenario 9 FAILED (%0d errors).", scenario_errors);
 
-        // -------------------------------------------------------------
+        
         // Scenario 10: Worst-Case Hash Bucket (4-Way Collision, NVDA/Bank 3)
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         @(negedge clk);
         s_axis_tvalid = 1;
@@ -591,9 +591,9 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 10 Passed: 4-way hash collision survived!");
         else                      $display("Scenario 10 FAILED (%0d errors).", scenario_errors);
 
-        // -------------------------------------------------------------
+        
         // Scenario 11: The Short Packet Attack
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         @(negedge clk);
         s_axis_tvalid = 1;
@@ -621,9 +621,9 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 11 Passed: Short packet attack defended!");
         else                      $display("Scenario 11 FAILED (%0d errors).", scenario_errors);
 
-        // =============================================================
+        
         // PHASE 3: RISK LAYER (Sequence Anomaly Detection)
-        // =============================================================
+        
 
         // Clean reset so Risk Layer's sequence memory is cleared
         // from all the Sequence 100 packets sent in Phases 1 and 2.
@@ -634,9 +634,9 @@ module tb_top;
         reset_n = 1;
         repeat(3) @(negedge clk); // let pipeline drain after reset
 
-        // -------------------------------------------------------------
+        
         // Scenario 12: Sequential Packets (No Anomaly)
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         // Hold clear_anomaly for 2 negedge cycles so at least one
         // posedge sees it=1, avoiding the #-delay/posedge race.
@@ -653,9 +653,9 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 12 Passed: Sequential packets, no anomaly!");
         else                      $display("Scenario 12 FAILED (%0d errors).", scenario_errors);
 
-        // -------------------------------------------------------------
+        
         // Scenario 13: Sequence Gap
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         clear_anomaly = 1; @(negedge clk); clear_anomaly = 0;
         send_packet(48'h4141504C2020, 16'd104); // AAPL Seq 104 (Skipped 103!)
@@ -667,9 +667,9 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 13 Passed: Sequence gap detected!");
         else                      $display("Scenario 13 FAILED (%0d errors).", scenario_errors);
 
-        // -------------------------------------------------------------
+        
         // Scenario 14: Sequence Regression
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         clear_anomaly = 1; @(negedge clk); clear_anomaly = 0;
         send_packet(48'h4141504C2020, 16'd102); // AAPL Seq 102 (Regression!)
@@ -679,9 +679,9 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 14 Passed: Sequence regression detected!");
         else                      $display("Scenario 14 FAILED (%0d errors).", scenario_errors);
 
-        // -------------------------------------------------------------
+        
         // Scenario 15: Independent Tickers (No Cross-Contamination)
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         // Even though AAPL just regressed to 102, GOOG (Bank 1) is still at 0!
         clear_anomaly = 1;
@@ -697,13 +697,13 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 15 Passed: Independent ticker isolation confirmed!");
         else                      $display("Scenario 15 FAILED (%0d errors).", scenario_errors);
 
-        // =============================================================
+        
         // PHASE 4: OBSERVER LAYER (Latency Measurement)
-        // =============================================================
+        
 
-        // -------------------------------------------------------------
+        
         // Scenario 16: Timestamp Latency Offset
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         send_packet(48'h4141504C2020, 16'd200); // Send AAPL
         #50;
@@ -714,13 +714,13 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 16 Passed!");
         else                      $display("Scenario 16 FAILED (%0d errors).", scenario_errors);
 
-        // =============================================================
+        
         // PHASE 5: THE FINAL BOSS (V2 Architecture)
-        // =============================================================
+        
 
-        // -------------------------------------------------------------
+        
         // Scenario 17: Zero-Gap Back-to-Back Collision Test
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         @(negedge clk);
         // AAPL Packet - Beat 1
@@ -773,9 +773,9 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 17 Passed: Zero-Gap Collision Survived!");
         else                      $display("Scenario 17 FAILED (%0d errors).", scenario_errors);
 
-        // -------------------------------------------------------------
+        
         // Scenario 18: Early tlast (Short Packet) Zero-Gap Collision
-        // -------------------------------------------------------------
+        
         scenario_errors = 0;
         @(negedge clk);
         // Bad Packet - Beat 1 (EtherType OK)
@@ -824,11 +824,11 @@ module tb_top;
         if (scenario_errors == 0) $display("Scenario 18 Passed: Early tlast zero-gap survived!");
         else                      $display("Scenario 18 FAILED (%0d errors).", scenario_errors);
 
-        // =============================================================
+        
         // FINAL VERDICT — gated on actual error count
-        // =============================================================
+        
         if (error_count == 0) begin
-            $display("ALL 18 SCENARIOS PASSED! YOU WIN!");
+            $display("ALL SCENARIOS PASSED");
             $finish;
         end else begin
             $fatal(1, "%0d SCENARIO(S) FAILED. See errors above.", error_count);
